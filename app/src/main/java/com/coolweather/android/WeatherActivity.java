@@ -1,5 +1,6 @@
 package com.coolweather.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -71,7 +72,7 @@ public class WeatherActivity extends AppCompatActivity {
             View decorView = getWindow().getDecorView();
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
@@ -220,19 +221,20 @@ public class WeatherActivity extends AppCompatActivity {
 
     private void showWeatherInfo(Weather weather) {
 
-        try {
-            String cityName = weather.basic.cityName;
-            String updateTime = weather.basic.update.updateTime.split(" ")[1];
-            String degree = weather.now.temperature+"℃";//摄氏度的Unicode "\u2103";
-            String weatherInfo = weather.now.more.info;
+        if(weather !=null && "ok".equals(weather.status)){
 
-            titleCity.setText(cityName);
-            titleUpdateTime.setText(updateTime);
-            degreeText.setText(degree);
-            weatherInfoText.setText(weatherInfo);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+
+
+        String cityName = weather.basic.cityName;
+        String updateTime = weather.basic.update.updateTime.split(" ")[1];
+        String degree = weather.now.temperature+"℃";//摄氏度的Unicode "\u2103";
+        String weatherInfo = weather.now.more.info;
+
+        titleCity.setText(cityName);
+        titleUpdateTime.setText(updateTime);
+        degreeText.setText(degree);
+        weatherInfoText.setText(weatherInfo);
+
 
         forecastLayout.removeAllViews();
         for(Forecast forecast:weather.forecastList) {
@@ -261,6 +263,11 @@ public class WeatherActivity extends AppCompatActivity {
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
 
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
+        }else {
+            Toast.makeText(WeatherActivity.this, "获取天气信息失败",Toast.LENGTH_SHORT).show();
+        }
         LogUtil.d("WeatherActivity", "Step-showWeatherInfo");
     }
 }
